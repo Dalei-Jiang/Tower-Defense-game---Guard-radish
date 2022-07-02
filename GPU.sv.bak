@@ -1,0 +1,95 @@
+module GPU(	input logic [9:0] DrawX, DrawY,
+				input logic			is_open, is_game, is_vict, is_fail,
+				input logic [2:0]	monster_occur, 
+				input int	offset_x, offset_y,
+				input logic Clk,
+				input [2:0] print_type,
+				input [9:0] offset_towerx, offset_towery,				
+				output logic [7:0]	display_type,
+				output logic [18:0]	read_address,
+				output int	counter
+			);
+			
+	
+	always_comb begin 
+	begin
+		counter = 0;
+		if (is_open==1) begin
+			if (DrawX>=280 && DrawX<361 && DrawY>=200 && DrawY<281) begin
+				counter = 6;
+				display_type = 8'h01;//test
+				read_address = (DrawX-280)+(DrawY-200)*81;
+			end
+			else begin
+				display_type = 8'h00;
+				read_address = DrawY*640+DrawX;
+			end
+		end
+		
+		else if (is_game==1) begin
+			
+			if (monster_occur == 3'b001) begin
+				display_type = 8'h04;
+				read_address = (22+offset_y)*45+(22+offset_x);
+			end
+			
+			else if (monster_occur == 3'b010) begin
+				display_type = 8'h05;
+				read_address = (10+offset_y)*21+(10+offset_x);
+			end
+			
+			else if (monster_occur == 3'b110) begin
+				display_type = 8'h0f;
+				read_address = (15+offset_y)*31+(15+offset_x);
+			end
+			else if (print_type == 3'b001) begin
+				display_type = 8'h10;
+				read_address = offset_towerx + offset_towery*50;
+			end
+			else begin
+				display_type = 8'h00;
+				read_address = DrawY*640+DrawX;
+			end
+//			else begin
+//				display_type = 8'h00;
+//				read_address = DrawY*640+DrawX;
+//			end
+		end
+		
+		else if (is_fail==1) begin
+			if (DrawX>=160 && DrawX<=479 && DrawY>=134 && DrawY<=346) begin
+				display_type = 8'h20;
+				read_address = (DrawX-160)+(DrawY-134)*320;			
+			end
+			else begin
+				if (monster_occur == 3'b000) begin
+					display_type = 8'h00;
+					read_address = DrawY*640+DrawX;
+				end
+				else if (monster_occur == 3'b001) begin
+					display_type = 8'h04;
+					read_address = (10+offset_y)*21+(10+offset_x);
+				end
+				else if (monster_occur == 3'b010) begin
+					display_type = 8'h05;
+					read_address = (10+offset_y)*21+(10+offset_x);
+				end
+				else if (monster_occur == 3'b110) begin
+					display_type = 8'h0f;
+					read_address = (15+offset_y)*31+(15+offset_x);
+				end
+				else begin
+					display_type = 8'h00;
+					read_address = DrawY*640+DrawX;
+				end
+			end
+		end
+
+		else begin
+				display_type = 8'h00;
+				read_address = DrawY*640+DrawX;
+		end
+	end
+	end
+	
+endmodule 

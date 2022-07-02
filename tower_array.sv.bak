@@ -1,0 +1,54 @@
+module tower_array(
+				input command_tw, Reset,
+				input build, sell,
+				input [2:0] build_location,
+				input [2:0] build_type,
+				input [7:0] fi_used_array,
+				input [7:0] print_array,
+				input [2:0] fi_occur_type[0:7],
+				input [9:0] offsetx_array[0:7],
+				input [9:0] offsety_array[0:7],
+				
+				input Clk,
+				output [7:0] toi_enable_array,
+				output [2:0] toi_type_array[0:7],
+				output [7:0] toi_sell_array,
+				output [9:0] x_pos[0:7],
+				output [9:0] y_pos[0:7],
+				output [2:0] print_type,
+				output [9:0] offset_towerx, offset_towery
+);
+//	logic [9:0] x_pos[0:7];
+//	logic [9:0] y_pos[0:7];
+	int j;
+	assign x_pos = '{130, 180, 230, 330, 380, 430, 140, 435};
+	assign y_pos = '{327, 327, 327, 327, 327, 327, 165, 165};
+	always_ff @ (posedge Clk) begin
+		if (command_tw) begin
+			if (build) begin
+				toi_enable_array[build_location] = 1'b1;
+				toi_type_array[build_location] = build_type;
+			end
+			else if (sell) begin
+				toi_sell_array[build_location] = 1'b1;
+			end
+		end
+		else begin
+			toi_enable_array = 8'b0;
+			toi_sell_array = 8'b0;
+		end
+
+		for (j=0; j<8; j=j+1) begin
+			if (fi_used_array[j] != 1'b0) begin
+				print_type = 3'b001;
+				offset_towerx = offsetx_array[j];
+				offset_towery = offsety_array[j];
+				break;
+			end
+			else if (j==15)
+				print_type = 3'b000;
+		end		
+	end	
+	
+	
+endmodule

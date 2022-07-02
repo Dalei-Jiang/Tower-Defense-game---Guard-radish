@@ -1,0 +1,13 @@
+module score (
+		input [15:0] used_array,
+		input [7:0]  fi_used_array,
+		input Reset, Clk
+		output int score
+);
+	logic [15:0] timely_mons;
+	logic [7:0] timely_tower;
+	initial begin
+		used_array = 16'h0;
+		fi_used_array = 8'b0;
+	end 
+endmodule
